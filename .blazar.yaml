@@ -1,0 +1,15 @@
+enabled: true
+
+env:
+  SET_VERSION_OVERRIDE: 1.0-$GIT_BRANCH-SNAPSHOT
+  MAVEN_ARGS: -DskipTests -am -pl revapi-java,revapi-reporter-text,revapi-java-spi,revapi-standalone
+
+buildpack:
+  host: git.hubteam.com
+  organization: HubSpot
+  repository: Blazar-Buildpack-Java
+  branch: v2-single-module
+
+provides:
+  - name: revapi
+    version: 1.0-$GIT_BRANCH-SNAPSHOT
