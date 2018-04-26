@@ -18,13 +18,11 @@ package org.revapi.standalone;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +32,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import gnu.getopt.Getopt;
-import gnu.getopt.LongOpt;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystem;
@@ -55,6 +51,9 @@ import org.revapi.maven.utils.ScopeDependencySelector;
 import org.revapi.maven.utils.ScopeDependencyTraverser;
 import org.revapi.simple.FileArchive;
 import org.slf4j.LoggerFactory;
+
+import gnu.getopt.Getopt;
+import gnu.getopt.LongOpt;
 import pw.krejci.modules.maven.MavenBootstrap;
 import pw.krejci.modules.maven.ModuleSpecController;
 import pw.krejci.modules.maven.ProjectModule;
@@ -273,7 +272,7 @@ public final class Main {
         ProjectModule.Builder bld = ProjectModule.build();
         bld.localRepository(cacheDir);
         remoteRepositories().forEach(r -> bld.addRemoteRepository(r.getId(), r.getUrl()));
-        
+
         if (extensionGAVs != null) {
             for (String gav : extensionGAVs) {
                 bld.addDependency(gav);
