@@ -229,7 +229,7 @@ public final class Main {
             }
         }
 
-        if (extensionGAVs == null || (oldArchivePaths == null && oldGavs == null) ||
+        if ((oldArchivePaths == null && oldGavs == null) ||
                 (newArchivePaths == null && newGavs == null)) {
 
             usage(scriptFileName);
