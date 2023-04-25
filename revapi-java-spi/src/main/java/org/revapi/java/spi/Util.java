@@ -1072,13 +1072,6 @@ public final class Util {
         } catch (RuntimeException e) {
             LOG.debug("Failed to find all super types of type '" + toHumanReadableString(type) + ". Possibly "
                     + "missing classes?", e);
-        } catch (StackOverflowError e) {
-            // Unfortunately, an SO here means toHumanReadableString will also be broken
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Got StackOverflowError filling super types", e);
-            } else {
-                LOG.warn("Got StackOverflowError filling super types");
-            }
         }
     }
 
