@@ -22,11 +22,11 @@
     <parent>
         <groupId>org.revapi</groupId>
         <artifactId>revapi-build</artifactId>
-        <version>46-SNAPSHOT</version>
+        <version>47-SNAPSHOT</version>
         <relativePath>../revapi-build</relativePath>
     </parent>
     <artifactId>revapi-maven-plugin</artifactId>
-    <version>0.14.7-SNAPSHOT</version>
+    <version>0.15.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     <name>Maven Plugin</name>
     <description>Maven integration for Revapi.</description>
@@ -54,10 +54,10 @@
         <maven-invoker.version>3.2.2</maven-invoker.version>
         <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
         <maven.version>3.2.5</maven.version>
-        <revapi-java-spi.version>0.24.0-SNAPSHOT</revapi-java-spi.version>
-        <revapi-java.version>0.27.0-SNAPSHOT</revapi-java.version>
-        <revapi-reporter-text.version>0.14.6-SNAPSHOT</revapi-reporter-text.version>
-        <revapi.version>0.14.5-SNAPSHOT</revapi.version>
+        <revapi-java-spi.version>0.25.1-SNAPSHOT</revapi-java-spi.version>
+        <revapi-java.version>0.28.1-SNAPSHOT</revapi-java.version>
+        <revapi-reporter-text.version>0.15.1-SNAPSHOT</revapi-reporter-text.version>
+        <revapi.version>0.15.1-SNAPSHOT</revapi.version>
     </properties>
     <dependencies>
         <dependency>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>org.revapi</groupId>
             <artifactId>revapi-basic-features</artifactId>
-            <version>0.12.6-SNAPSHOT</version>
+            <version>0.13.1-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -129,7 +129,7 @@
         <dependency>
             <groupId>org.revapi</groupId>
             <artifactId>revapi-maven-utils</artifactId>
-            <version>0.10.7-SNAPSHOT</version>
+            <version>0.10.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.revapi</groupId>
@@ -288,7 +288,7 @@
                                     We're running in the Maven environment, so whatever Maven breaks during our upgrades,
                                     the users will have to deal with anyway...
                                 -->
-                                <exclude>
+                                <exclude combine.children="append">
                                     <item>org\.apache\.maven[.:].*</item>
                                     <item>org\.codehaus\.plexus:.*</item>
                                     <item>org\.eclipse\.sisu:.*</item>

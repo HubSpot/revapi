@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 Lukas Krejci
+ * Copyright 2014-2022 Lukas Krejci
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,7 +99,7 @@ final class AnalysisConfigurationGatherer {
                 }
 
                 String readErrorMessage = "Error while processing the configuration file on "
-                        + (path == null ? "classpath " + resource : "path " + path);
+                        + (path == null ? "classpath " + resource : "path " + path) + ": ";
 
                 Supplier<Iterator<InputStream>> configFileContents;
 
@@ -155,7 +155,7 @@ final class AnalysisConfigurationGatherer {
                     try (InputStream in = it.next()) {
                         config = readJson(in);
                     } catch (IllegalArgumentException | IOException e) {
-                        throw new MojoExecutionException(readErrorMessage, e.getCause());
+                        throw new MojoExecutionException(readErrorMessage + e.getMessage(), e);
                     }
 
                     if (config == null) {
@@ -179,7 +179,7 @@ final class AnalysisConfigurationGatherer {
                                 mergeXmlConfigFile(revapi, ctxBld, configFile, rdr);
                             }
                         } catch (IllegalArgumentException | IOException | XmlPullParserException e) {
-                            throw new MojoExecutionException(readErrorMessage, e.getCause());
+                            throw new MojoExecutionException(readErrorMessage + e.getMessage(), e);
                         }
 
                         idx++;
@@ -197,14 +197,14 @@ final class AnalysisConfigurationGatherer {
                     ctxBld.mergeConfiguration(expandVariables(JSONUtil.parse(JSONUtil.stripComments(text))));
                 }
             } catch (PlexusConfigurationException e) {
-                throw new MojoExecutionException("Failed to read the configuration", e);
+                throw new MojoExecutionException("Failed to read the configuration: " + e.getMessage(), e);
             }
         }
     }
 
     private void mergeXmlConfigFile(Revapi revapi, AnalysisContext.Builder ctxBld, ConfigurationFile configFile,
             Reader rdr) throws IOException, XmlPullParserException {
-        XmlToJson<PlexusConfigurationWrapper> conv = new XmlToJson<>(revapi, PlexusConfigurationWrapper::getName,
+        XmlToJson<PlexusConfigurationWrapper> conv = XmlToJson.fromRevapi(revapi, PlexusConfigurationWrapper::getName,
                 PlexusConfigurationWrapper::getValue, PlexusConfigurationWrapper::getAttribute,
                 PlexusConfigurationWrapper::getChildren);
 
@@ -301,7 +301,7 @@ final class AnalysisConfigurationGatherer {
 
     private static JsonNode expandVariable(JsonNode node, PropertyValueResolver resolver) {
         // Intentionally call .toString(), because that produces a valid JSON representation of the node that we will
-        // then interpolate and reparse. Reparsing is required
+        // then interpolate and reparse.
         String val = node.toString();
         if (!resolver.containsVariables(val)) {
             return node;
@@ -324,7 +324,7 @@ final class AnalysisConfigurationGatherer {
             try {
                 return config.getValue();
             } catch (PlexusConfigurationException e) {
-                throw new IllegalStateException("Failed to read configuration", e);
+                throw new IllegalStateException("Failed to read configuration: " + e.getMessage(), e);
             }
         }
 
@@ -332,7 +332,7 @@ final class AnalysisConfigurationGatherer {
             try {
                 return config.getAttribute(name);
             } catch (PlexusConfigurationException e) {
-                throw new IllegalStateException("Failed to read configuration", e);
+                throw new IllegalStateException("Failed to read configuration: " + e.getMessage(), e);
             }
         }
 
@@ -344,6 +344,54 @@ final class AnalysisConfigurationGatherer {
         public PlexusConfigurationWrapper getChild(String name) {
             PlexusConfiguration c = config.getChild(name);
             return c == null ? null : new PlexusConfigurationWrapper(c);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            plexusToString(0, sb, config);
+            return sb.toString();
+        }
+    }
+
+    private static void plexusToString(int indent, StringBuilder sb, PlexusConfiguration cfg) {
+        indent(sb, indent * 2);
+        sb.append("<").append(cfg.getName());
+        String[] attrs = cfg.getAttributeNames();
+
+        if (attrs != null && attrs.length > 0) {
+            for (String attr : attrs) {
+                sb.append(" ").append(attr).append("=\"");
+                sb.append(cfg.getAttribute(attr, "$$UNKNOWN$$"));
+                sb.append("\"");
+            }
+        }
+
+        int childCount = cfg.getChildCount();
+        if (childCount > 0) {
+            sb.append(">\n");
+            for (int i = 0; i < childCount; ++i) {
+                plexusToString(indent + 1, sb, cfg.getChild(i));
+                sb.append("\n");
+            }
+            indent(sb, indent * 2);
+            sb.append("</").append(cfg.getName()).append(">");
+        } else {
+            String val = cfg.getValue(null);
+            if (val == null) {
+                sb.append(" />");
+            } else {
+                sb.append(">");
+                sb.append(val);
+                sb.append("</").append(cfg.getName()).append(">");
+            }
+        }
+
+    }
+
+    private static void indent(StringBuilder sb, int times) {
+        for (int i = 0; i < times; i++) {
+            sb.append(" ");
         }
     }
 }
