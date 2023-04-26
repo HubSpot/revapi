@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 Lukas Krejci
+ * Copyright 2014-2022 Lukas Krejci
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,24 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.revapi.java.model;
+public class Class {
 
-import javax.lang.model.element.Element;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
+    public void method() {
 
-/**
- * @author Lukas Krejci
- * 
- * @since 0.1
- */
-public final class MissingTypeElement {
-
-    public static boolean isMissing(Element e) {
-        return isMissing(e.asType());
-    }
-
-    public static boolean isMissing(TypeMirror type) {
-        return type.getKind() == TypeKind.NONE || type.getKind() == TypeKind.ERROR;
     }
 }

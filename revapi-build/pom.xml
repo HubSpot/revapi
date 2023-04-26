@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2014-2021 Lukas Krejci
+    Copyright 2014-2022 Lukas Krejci
     and other contributors as indicated by the @author tags.
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
         <relativePath>../revapi-parent</relativePath>
     </parent>
     <artifactId>revapi-build</artifactId>
-    <version>46-SNAPSHOT</version>
+    <version>47-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Revapi Build Parent</name>
     <description>This module is meant to serve as parent for other modules that actually contain code and
@@ -54,8 +54,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <self-api-check.java-extension-version>0.26.1</self-api-check.java-extension-version>
-        <self-api-check.maven-version>0.14.6</self-api-check.maven-version>
+        <self-api-check.java-extension-version>0.28.0</self-api-check.java-extension-version>
+        <self-api-check.maven-version>0.15.0</self-api-check.maven-version>
         <version.ch.qos.logback>1.2.0</version.ch.qos.logback>
         <version.com.google.code.findbugs>3.0.0</version.com.google.code.findbugs>
         <version.org.junit>5.7.0</version.org.junit>
@@ -492,6 +492,14 @@
                                         <behavior>report</behavior>
                                     </missing-classes>
                                 </revapi.java>
+                                <revapi.filter>
+                                    <archives>
+                                        <exclude>
+                                            <!-- jackson is notorious for making small breaking changes all the time -->
+                                            <item>com\.fasterxml\.jackson.*</item>
+                                        </exclude>
+                                    </archives>
+                                </revapi.filter>
                                 <revapi.versions>
                                     <enabled>true</enabled>
                                     <!--

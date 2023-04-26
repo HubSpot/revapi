@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 Lukas Krejci
+ * Copyright 2014-2022 Lukas Krejci
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1039,8 +1040,8 @@ public final class Util {
      * @return the list of super types
      */
     @Nonnull
-    public static List<TypeMirror> getAllSuperTypes(@Nonnull Types types, @Nonnull TypeMirror type) {
-        ArrayList<TypeMirror> ret = new ArrayList<>();
+    public static Set<TypeMirror> getAllSuperTypes(@Nonnull Types types, @Nonnull TypeMirror type) {
+        Set<TypeMirror> ret = new LinkedHashSet<>();
         fillAllSuperTypes(types, type, ret);
 
         return ret;
@@ -1057,26 +1058,20 @@ public final class Util {
      * @param result
      *            the list to add the results to.
      */
-    public static void fillAllSuperTypes(@Nonnull Types types, @Nonnull TypeMirror type,
-            @Nonnull List<TypeMirror> result) {
+    private static void fillAllSuperTypes(@Nonnull Types types, @Nonnull TypeMirror type,
+            @Nonnull Set<TypeMirror> result) {
 
         try {
             List<? extends TypeMirror> superTypes = types.directSupertypes(type);
 
             for (TypeMirror t : superTypes) {
-                result.add(t);
-                fillAllSuperTypes(types, t, result);
+                if (result.add(t)) {
+                    fillAllSuperTypes(types, t, result);
+                }
             }
         } catch (RuntimeException e) {
             LOG.debug("Failed to find all super types of type '" + toHumanReadableString(type) + ". Possibly "
                     + "missing classes?", e);
-        } catch (StackOverflowError e) {
-            // Unfortunately, an SO here means toHumanReadableString will also be broken
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Got StackOverflowError filling super types", e);
-            } else {
-                LOG.warn("Got StackOverflowError filling super types");
-            }
         }
     }
 
@@ -1122,12 +1117,12 @@ public final class Util {
      * @param typeEnvironment
      *            the environment in which the type lives
      *
-     * @return true if type a sub type of one of the provided super types, false otherwise.
+     * @return true if type is a sub type of one of the provided super types, false otherwise.
      */
     public static boolean isSubtype(@Nonnull TypeMirror type, @Nonnull List<? extends TypeMirror> superTypes,
             @Nonnull Types typeEnvironment) {
 
-        List<TypeMirror> typeSuperTypes = getAllSuperTypes(typeEnvironment, type);
+        List<TypeMirror> typeSuperTypes = new ArrayList<>(getAllSuperTypes(typeEnvironment, type));
         typeSuperTypes.add(0, type);
 
         for (TypeMirror t : typeSuperTypes) {
